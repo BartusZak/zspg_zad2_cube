@@ -15,6 +15,9 @@ public:
                                        GLfloat aspect_ratio,
                                        GLfloat near_plane,
                                        GLfloat far_plane);
+    static Mat4 CreatePerpendicularViewMatrix(GLfloat left, GLfloat right,
+                                              GLfloat bottom, GLfloat top,
+                                              GLfloat n, GLfloat f);
     void RotateAboutX(GLfloat angle); //gedrees
     void RotateAboutY(GLfloat angle); //gedrees
     void RotateAboutZ(GLfloat angle); //gedrees

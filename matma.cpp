@@ -116,6 +116,22 @@ Mat4 Mat4::CreateProjectionMatrix(
     return out;
 }
 
+Mat4 Mat4::CreatePerpendicularViewMatrix(
+        GLfloat left, GLfloat right,
+        GLfloat bottom, GLfloat top,
+        GLfloat n, GLfloat f){
+    Mat4 out(0);
+
+    out.matrix_[0] = 2 / (right - left);
+    out.matrix_[3] = -(right + left) / (right - left);
+    out.matrix_[5] = 2 / (top - bottom);
+    out.matrix_[7] = -(top + bottom) / (top - bottom);
+    out.matrix_[10] = -(2 / (f - n));
+    out.matrix_[11] = -(f + n) / (f - n);
+    out.matrix_[15] = 1;
+
+    return out;
+}
 Mat4::Mat4(GLfloat val){
     for(int i=0; i<16; i++){
         matrix_[i]=val;

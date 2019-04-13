@@ -6,21 +6,27 @@
 Cube::Cube(GLfloat init_velocity, GLfloat init_angle){
     velocity_ = init_velocity;
     angle_ = init_angle;
-    animated_ = true;
+    animated_ = false;
 }
 
-
-void Cube::Move(GLfloat delta_t){
-    if (!animated_) return;
-    angle_ += delta_t * velocity_;
-    if(angle_>360) angle_ -= 360;
-    if(angle_<-360) angle_ += 360;
-    model_matrix_.SetUnitMatrix();
-    model_matrix_.RotateAboutX(angle_);
-    model_matrix_.RotateAboutY(angle_);
+void Cube::Move(){
 }
 
+void Cube::MoveLeft(){
+ model_matrix_.RotateAboutY(-velocity_);
+}
 
+void Cube::MoveRight(){
+ model_matrix_.RotateAboutY(velocity_);
+}
+
+void Cube::MoveUp(){
+ model_matrix_.RotateAboutX(-velocity_);
+}
+
+void Cube::MoveDown(){
+model_matrix_.RotateAboutX(velocity_);
+}
 
 void Cube::SpeedUp(){
     velocity_ *= 1.09544f;
@@ -34,31 +40,33 @@ void Cube::ToggleAnimated(){
     animated_ = ! animated_;
 }
 
+const GLuint kIndices[52] =
+{
+  0,1,2,    0,2,7,  2,3,11, 9,11,2,
+  3,11,5,   3,4,5,  0,1,10, 10,8,0,
+  10,8,5,   5,4,10, 8,5,6,  6,5,9,
+  6,7,8,    7,2,9,  7,6,9,  1,10,3,
+  3,4,10
+};
+
 void Cube::Initialize(){
     initializeOpenGLFunctions();
 
-    const ColorVertex kVertices[8] =
+    const ColorVertex kVertices[12] =
     {
-        { { -.5f, -.5f,  .5f, 1.0f }, { 1, 1, 1, 1 } },
-        { { -.5f,  .5f,  .5f, 1.0f }, { 1, 0, 0, 1 } },
-        { {  .5f,  .5f,  .5f, 1.0f }, { 0, 1, 0, 1 } },
-        { {  .5f, -.5f,  .5f, 1.0f }, { 1, 1, 0, 1 } },
-        { { -.5f, -.5f, -.5f, 1.0f }, { 0, 0, 1, 1 } },
-        { { -.5f,  .5f, -.5f, 1.0f }, { 1, 0, 0, 1 } },
-        { {  .5f,  .5f, -.5f, 1.0f }, { 1, 0, 1, 1 } },
-        { {  .5f, -.5f, -.5f, 1.0f }, { 0, 0, 0, 1 } }
+        { { -.5f, -.5f,  .0f, 1.0f }, { 0, 1, 1, 1 } },
+        { { -.5f, -.5f, -.5f, 1.0f }, { 1, 0, 1, 1 } },
+        { {  .0f, -.5f, -.5f, 1.0f }, { 0, 1, 1, 1 } },
+        { {  .5f, -.5f, -.5f, 1.0f }, { 1, 0, 1, 1 } },
+        { {  .5f,  .5f, -.5f, 1.0f }, { 0, 1, 1, 1 } },
+        { {  .5f,  .5f,  .0f, 1.0f }, { 1, 0, 1, 1 } },
+        { {  .0f,  .5f,  .5f, 1.0f }, { 0, 1, 1, 1 } },
+        { { -.5f,  .0f,  .0f, 1.0f }, { 1, 0, 1, 1 } },
+        { { -.5f,  .5f,  .0f, 1.0f }, { 0, 1, 1, 1 } },
+        { {  .5f,  .0f,  .0f, 1.0f }, { 1, 0, 1, 1 } },
+        { { -.5f,  .5f, -.5f, 1.0f }, { 0, 1, 1, 1 } },
+        { {  .5f, -.5f,  .0f, 1.0f }, { 1, 1, 0, 1 } }
     };
-
-    const GLuint kIndices[36] =
-    {
-      0,1,2,  0,2,3,
-      4,0,3,  4,3,7,
-      4,5,1,  4,1,0,
-      3,2,6,  3,6,7,
-      1,5,6,  1,6,2,
-      7,6,5,  7,5,4
-    };
-
 
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
@@ -91,10 +99,8 @@ void Cube::Draw(ModelProgram &program) {
 
     program.SetModelMatrix(model_matrix_);
 
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
     glUseProgram(0);
-
-
 }

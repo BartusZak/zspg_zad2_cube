@@ -22,6 +22,7 @@ Window::Window( QWindow* parent)
 
     view_matrix_.SetUnitMatrix();
     projection_matrix_.SetUnitMatrix();
+    perpendicular_view_matrix_.SetUnitMatrix();
 
     device_=nullptr;
 
@@ -83,7 +84,7 @@ void Window::Initialize(){
 
     InitPrograms();
     InitModels();
-
+    perpendicular_view_matrix_ = Mat4::CreatePerpendicularViewMatrix(-5,5,-5,5,-100,100);
     projection_matrix_ = Mat4::CreateProjectionMatrix(60,
                                                       static_cast<float>(width())/static_cast<float>(height()),
                                                       1.0f,
@@ -138,26 +139,20 @@ void Window::render(){
 
    if (last_time_ == 0) last_time_ = now;
 
-   float delta_t = static_cast<float>( now - last_time_ ) / CLOCKS_PER_SEC;
+//   float delta_t = static_cast<float>( now - last_time_ ) / CLOCKS_PER_SEC;
 
    last_time_ = now;
-
-   cube_.Move(delta_t);
 
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
    cube_.Draw(program_);
 
-
-
    QPainter painter(device_);
    render(&painter);
    context_->swapBuffers(this);
 
     QCoreApplication::postEvent(this, new QEvent(QEvent::Expose));
-
-
 }
 
 void Window::render(QPainter *painter)
@@ -165,14 +160,51 @@ void Window::render(QPainter *painter)
     Q_UNUSED(painter);
 }
 
+void Window::ZoomIn(){
+    view_matrix_.Translate(0,0,1.0f);
+     SetViewMatrix();
+}
+
+void Window::ZoomOut(){
+    view_matrix_.Translate(0,0,-1.0f);
+    SetViewMatrix();
+}
+
+void Window::SetPerspectiveView(){
+    SetProjectionMatrix();
+}
+
+void Window::SetPerpendicularView(){
+    glUseProgram(program_);
+    program_.SetProjectionMatrix(perpendicular_view_matrix_);
+    glUseProgram(0);
+}
 
 void Window::keyPressEvent(QKeyEvent *event){
     if(Qt::Key_Escape == event->key() ) QCoreApplication::exit();
     else if(Qt::Key_Right == event->key() ) {
-        cube_.SpeedUp();
+        cube_.MoveRight();
     }
     else if(Qt::Key_Left == event->key() ) {
-        cube_.SlowDown();
+        cube_.MoveLeft();
+    }
+    else if(Qt::Key_Up == event->key() ) {
+        cube_.MoveUp();
+    }
+    else if(Qt::Key_Down == event->key() ) {
+        cube_.MoveDown();
+    }
+    else if(Qt::Key_PageUp == event->key() ) {
+        ZoomIn();
+    }
+    else if(Qt::Key_PageDown == event->key() ) {
+        ZoomOut();
+    }
+    else if(Qt::Key_Home == event->key() ) {
+        SetPerspectiveView();
+    }
+    else if(Qt::Key_End == event->key() ) {
+        SetPerpendicularView();
     }
 }
 

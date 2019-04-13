@@ -15,7 +15,11 @@ class Cube: public IndexModel, public MovableModel{
     void SetVelocity(GLfloat velocity){velocity_= velocity;}
     void Initialize();
     void Draw(ModelProgram & program);
-    void Move(GLfloat delta_t);
+    void Move();
+    void MoveLeft();
+    void MoveRight();
+    void MoveUp();
+    void MoveDown();
     void SpeedUp();
     void SlowDown();
     void ToggleAnimated();

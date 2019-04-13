@@ -42,9 +42,15 @@ private:
     void SetViewMatrix();
     void SetProjectionMatrix();
 
+    void ZoomIn();
+    void ZoomOut();
+    void SetPerspectiveView();
+    void SetPerpendicularView();
+
     Cube cube_;
     ModelProgram program_;
 
+    Mat4 perpendicular_view_matrix_;
     Mat4 projection_matrix_;
     Mat4 view_matrix_;
 
